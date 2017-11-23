@@ -244,6 +244,10 @@ def main(argv=None):
 
             attributes = "; ".join(attributes)
 
+            # Capture if None and set to . format
+            if gtf.frame is None:
+                gtf.frame = "."
+
             options.stdout.write("\t".join(map(str, (gtf.contig,
                                                      gtf.source,
                                                      gtf.feature,
