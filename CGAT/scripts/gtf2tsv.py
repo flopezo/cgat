@@ -203,6 +203,8 @@ def main(argv=None):
             except KeyError as msg:
                 raise KeyError("incomplete entry %s: %s: %s" %
                                (str(data), str(map_header2column), msg))
+            if gtf.frame is None:
+                gtf.frame = "."
             # output gtf entry in gtf format
             options.stdout.write("%s\n" % str(gtf))
 
@@ -248,18 +250,8 @@ def main(argv=None):
             if gtf.frame is None:
                 gtf.frame = "."
 
-            options.stdout.write("\t".join(map(str, (gtf.contig,
-                                                     gtf.source,
-                                                     gtf.feature,
-                                                     gtf.start,
-                                                     gtf.end,
-                                                     GTF.toDot(gtf.score),
-                                                     gtf.strand,
-                                                     gtf.frame,
-                                                     gtf.gene_id,
-                                                     gtf.transcript_id,
-                                                     attributes,
-                                                     ))) + "\n")
+            options.stdout.write(str(gtf) + "\n")
+
     E.Stop()
 
 if __name__ == '__main__':
