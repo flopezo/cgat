@@ -76,7 +76,7 @@ dependencies:
 - r-wgcna=1.51
 - rdflib=4.2.2
 - rpy2=2.8.5
-- samtools=1.4.1
+- samtools=1.6
 - scikit-learn=0.19.0
 - scipy=0.19.1
 - setuptools=36.3.0
