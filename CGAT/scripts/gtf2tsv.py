@@ -167,7 +167,7 @@ def main(argv=None):
             for a in attributes:
                 try:
                     val = getattr(gtf, a)
-                except AttributeError:
+                except (AttributeError, KeyError):
                     val = ""
                 options.stdout.write("\t%s" % val)
             options.stdout.write("\n")
@@ -227,7 +227,7 @@ def main(argv=None):
         for gtf in GTF.iterator(options.stdin):
             try:
                 map_fr2to[fr(gtf)] = to(gtf)
-            except AttributeError:
+            except (AttributeError, KeyError):
                 pass
 
         for x, y in sorted(map_fr2to.items()):
