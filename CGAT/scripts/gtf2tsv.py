@@ -164,12 +164,17 @@ def main(argv=None):
         options.stdout.write("\t".join(header) + "\n")
 
         for gtf in data:
+            first = True
             for a in attributes:
                 try:
                     val = getattr(gtf, a)
                 except (AttributeError, KeyError):
                     val = ""
-                options.stdout.write("\t%s" % val)
+                if first:
+                    options.stdout.write("%s" % val)
+                    first = False
+                else:
+                    options.stdout.write("\t%s" % val)
             options.stdout.write("\n")
 
     elif options.invert:
