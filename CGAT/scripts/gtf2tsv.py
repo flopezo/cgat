@@ -27,7 +27,7 @@ mapping gene identifiers to transcripts or peptides.
 USING GFF3 FILE:
 The script also can convert gff3 formatted files to tsv files when
 specifiying the option --is-gff3 and --attributes-as-columns. Currently only
-the full GFF3 to tasv is implimented. Further improvements to this script can
+the full GFF3 to task is implimented. Further improvements to this script can
 be made to only output the attributes only, i.e. --output-only-attributes.
 
 
@@ -82,6 +82,7 @@ Command line options
 import sys
 import re
 import CGAT.GTF as GTF
+import CGAT.GFF3 as GFF3
 import CGAT.Experiment as E
 
 
@@ -109,7 +110,7 @@ def main(argv=None):
         help="output attributes as separate columns "
         "[default=%default].")
 
-    parser.add_option("--is-gff", dest="is_gtf", action="store_false",
+    parser.add_option("--is-gff3", dest="is_gtf", action="store_false",
                       help="input file is in gtf format [default=%default] ")
 
     parser.add_option(
@@ -141,9 +142,15 @@ def main(argv=None):
 
         attributes = set()
         data = []
-        for gtf in GTF.iterator(options.stdin):
-            data.append(gtf)
-            attributes = attributes.union(set(gtf.keys()))
+        if options.is_gtf:
+            for gtf in GTF.iterator(options.stdin):
+                data.append(gtf)
+                attributes = attributes.union(set(gtf.keys()))
+
+        else:
+            for gff in GFF3.iterator_from_gff(options.stdin):
+                data.append(gff)
+                attributes = attributes.union(set(gff.attributes))
 
         # remove gene_id and transcript_id, as they are used
         # explicitely later
@@ -151,31 +158,60 @@ def main(argv=None):
 
         attributes = sorted(list(attributes))
 
-        if options.only_attributes:
-            header = ["gene_id", "transcript_id"] + attributes
-        else:
-            header = ["contig", "source", "feature",
+        # Select whether gtf of gff for output columns
+        if options.is_gtf:
+            if options.only_attributes:
+                header = ["gene_id", "transcript_id"] + attributes
+            else:
+                header = ["contig", "source", "feature",
                       "start", "end", "score", "strand",
                       "frame", "gene_id",
                       "transcript_id", ] + attributes
+        else:
+            if options.only_attributes:
+                header = attributes
+            else:
+                header = ["contig", "source", "feature",
+                      "start", "end", "score", "strand",
+                      "frame"] + attributes
 
-        attributes = header
+        attributes_new = header
 
         options.stdout.write("\t".join(header) + "\n")
 
-        for gtf in data:
-            first = True
-            for a in attributes:
-                try:
-                    val = getattr(gtf, a)
-                except (AttributeError, KeyError):
-                    val = ""
-                if first:
-                    options.stdout.write("%s" % val)
-                    first = False
-                else:
-                    options.stdout.write("\t%s" % val)
-            options.stdout.write("\n")
+        if options.is_gtf:
+            for gtf in data:
+                first = True
+                for a in attributes_new:
+                    try:
+                        val = getattr(gtf, a)
+                    except (AttributeError, KeyError):
+                        val = ""
+                    if first:
+                        options.stdout.write("%s" % val)
+                        first = False
+                    else:
+                        options.stdout.write("\t%s" % val)
+                options.stdout.write("\n")
+        else:
+            for gff in data:
+                options.stdout.write(("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t") % (gff.contig,
+                                    gff.source, gff.feature, gff.start, gff.end,
+                                    gff.score, gff.strand, gff.frame))
+
+                first = True
+                for a in attributes:
+                    try:
+                        val = (gff.attributes[a])
+                    except (AttributeError, KeyError):
+                        val = ''
+                    if first:
+                        options.stdout.write("%s" % val)
+                        first = False
+                    else:
+                        options.stdout.write("\t%s" % val)
+                options.stdout.write("\n")
+
 
     elif options.invert:
 
