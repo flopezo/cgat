@@ -164,16 +164,16 @@ def main(argv=None):
                 header = ["gene_id", "transcript_id"] + attributes
             else:
                 header = ["contig", "source", "feature",
-                      "start", "end", "score", "strand",
-                      "frame", "gene_id",
-                      "transcript_id", ] + attributes
+                          "start", "end", "score", "strand",
+                          "frame", "gene_id",
+                          "transcript_id", ] + attributes
         else:
             if options.only_attributes:
                 header = attributes
             else:
                 header = ["contig", "source", "feature",
-                      "start", "end", "score", "strand",
-                      "frame"] + attributes
+                          "start", "end", "score", "strand",
+                          "frame"] + attributes
 
         attributes_new = header
 
@@ -196,8 +196,8 @@ def main(argv=None):
         else:
             for gff in data:
                 options.stdout.write(("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t") % (gff.contig,
-                                    gff.source, gff.feature, gff.start, gff.end,
-                                    gff.score, gff.strand, gff.frame))
+                                                                             gff.source, gff.feature, gff.start, gff.end,
+                                                                             gff.score, gff.strand, gff.frame))
 
                 first = True
                 for a in attributes:
@@ -211,7 +211,6 @@ def main(argv=None):
                     else:
                         options.stdout.write("\t%s" % val)
                 options.stdout.write("\n")
-
 
     elif options.invert:
 
